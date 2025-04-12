@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-// structura comori
 typedef struct {
     int id;
     char username[50];
@@ -21,5 +20,8 @@ typedef struct {
 
 void add_treasure(char *hunt_id);
 void list_treasures(char *hunt_id);
+void view_treasure(char *hunt_id, int treasure_id);
+void remove_treasure(char *hunt_id, int treasure_id);
+void remove_hunt(char *hunt_id);
 
 #endif
