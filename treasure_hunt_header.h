@@ -1,17 +1,15 @@
+#ifndef TREASURE_HUNT_HEADER_H
+#define TREASURE_HUNT_HEADER_H
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdio.h>   
-#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <dirent.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <windows.h>
-#include <dirent.h>
 
-//structura comoara
+// structura comori
 typedef struct {
     int id;
     char username[50];
@@ -23,3 +21,5 @@ typedef struct {
 
 void add_treasure(char *hunt_id);
 void list_treasures(char *hunt_id);
+
+#endif
