@@ -5,17 +5,17 @@
 void log_operation(const char *hunt_id, const char *message) {
     char log_path[256];
     snprintf(log_path, sizeof(log_path), "%s/logged_hunt", hunt_id);
-    int fd_log = open(log_path, O_RDWR | O_CREAT | O_APPEND, 0644);
+    int fd_log = open(log_path, O_RDWR | O_CREAT | O_APPEND, 0644); //deschidem fișierul de log cu drept de citire și scriere, dar daca nu exista, il creeaza in modul append
     if (fd_log < 0) {
         perror("Error opening/creating log file");
         exit(EXIT_FAILURE);
     }
     time_t now = time(NULL);
-    dprintf(fd_log, "[%s] %s\n", ctime(&now), message);
+    dprintf(fd_log, "[%s] %s\n", ctime(&now), message); //scrie in fisierul de log timpul adaugarii si mesajul transmis ca parametru
     close(fd_log);
 }
 
-void ensure_hunt_directory(char *hunt_id) {
+void ensure_hunt_directory(char *hunt_id) { //verificam daca exista folderul de hunt, daca nu exista il creem cu mkdir
     struct stat st;
     if (stat(hunt_id, &st) != 0) {
         if (mkdir(hunt_id, 0755) < 0) {
@@ -25,7 +25,7 @@ void ensure_hunt_directory(char *hunt_id) {
     }
 }
 
-void create_symlink_for_log(const char *hunt_id) {
+void create_symlink_for_log(const char *hunt_id) { //face o legatura simbolica catre fisierul de log din directorul de hunt
     char log_path[256];
     char symlink_name[256];
     snprintf(log_path, sizeof(log_path), "%s/logged_hunt", hunt_id);
@@ -37,7 +37,7 @@ void create_symlink_for_log(const char *hunt_id) {
     close(fd);
     snprintf(symlink_name, sizeof(symlink_name), "logged_hunt-%s", hunt_id);
     unlink(symlink_name);
-    if (symlink(log_path, symlink_name) != 0) {
+    if (symlink(log_path, symlink_name) != 0) { //aici se creeaza legatura simbolica
         perror("Error creating symbolic link for log file");
     }
 }
@@ -113,7 +113,7 @@ void list_treasures(char *hunt_id) {
 
 void view_treasure(char *hunt_id, int treasure_id) {
     char file_path[256];
-    snprintf(file_path, sizeof(file_path), "%s/treasures.dat", hunt_id);
+    snprintf(file_path, sizeof(file_path), "%s/treasures.dat", hunt_id); //formateaza path-ul
     int fp = open(file_path, O_RDONLY);
     if (fp < 0) {
         perror("Error opening treasure file for viewing");
