@@ -142,15 +142,69 @@ int main() {
                 monitor_pid = 0;
                 printf("Monitor stopped.\n");
             }
-        } else if (strcmp(cmd, "exit") == 0) {
+        } else if (strcmp(cmd, "calculate_score") == 0) {
+	  DIR *d= opendir(".");
+	  if(!d){
+	    perror("opendir");
+	    continue;
+	  }
+	  struct dirent *e;
+	  while ((e = readdir(d)) != NULL) {
+	    if (e->d_type == DT_DIR &&
+		strcmp(e->d_name, ".") && strcmp(e->d_name, "..")) {
+	      char trep[300];//256 nu ajunge
+	      snprintf(trep, sizeof(trep), "%s/treasures.dat", e->d_name);
+	      if (access(trep, F_OK) != 0) continue;
+	      
+	      int pfd[2];
+	      if (pipe(pfd) < 0) {
+		perror("pipe");
+		continue;
+	      }
+	      
+	      pid_t cpid = fork();
+	      if (cpid < 0) {
+		perror("fork");
+		close(pfd[0]);
+		close(pfd[1]);
+		continue;
+	      }
+	      
+	      if (cpid == 0) {
+		close(pfd[0]);
+		dup2(pfd[1], STDOUT_FILENO);
+		close(pfd[1]);
+		execlp("./score_calc", "score_calc", e->d_name, NULL);
+		perror("execlp score_calc");
+		_exit(1);
+	      } else {
+		close(pfd[1]);
+		printf("=== Scores for hunt %s ===\n", e->d_name);
+		char line[256];
+		FILE *rf = fdopen(pfd[0], "r");
+		if (rf) {
+		  while (fgets(line, sizeof(line), rf)) {
+		    fputs(line, stdout);
+		  }
+		  fclose(rf);
+		} else {
+		  perror("fdopen");
+		  close(pfd[0]);
+		}
+		waitpid(cpid, NULL, 0);
+	      }
+	    }
+	  }
+	  closedir(d);
+	} else if (strcmp(cmd, "exit") == 0) {
             if (monitor_pid) {
                 printf("Monitor still running. Stop it before exiting.\n");
             } else {
                 break;
             }
-        } else if(strcmp(cmd, "help")==0){
-            printf("Command list:\n\"start_monitor\"\n\"list_hunts\"\n\"list_treasures\"   ->   usage: list_treasures <hunt_id>\n\"view_treasure\"   ->   usage: view_treasure <hunt_id> <treasure_id>\n\"stop_monitor\"\n\"exit\"\n");
-            } else {
+        } else if (strcmp(cmd, "help")==0) {
+            printf("Command list:\n\"start_monitor\"\n\"list_hunts\"\n\"list_treasures\"   ->   usage: list_treasures <hunt_id>\n\"view_treasure\"   ->   usage: view_treasure <hunt_id> <treasure_id>\n\"calculate_score\"\n\"stop_monitor\"\n\"exit\"\n");
+	} else {
             printf("Unknown command. Type \"help\" for a list of commands.\n");
         }
     }
