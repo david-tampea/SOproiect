@@ -84,6 +84,22 @@ int main() {
         if (!fgets(input, sizeof(input), stdin)) break;
         char *cmd = strtok(input, " \n");
         if (!cmd) continue;
+
+        /*
+    if (!monitor_pid && (
+            strcmp(cmd, "list_hunts")       == 0 ||
+            strcmp(cmd, "list_treasures")   == 0 ||
+            strcmp(cmd, "view_treasure")    == 0 ||
+            strcmp(cmd, "calculate_score")   == 0 ||
+            strcmp(cmd, "stop_monitor")      == 0
+        ))
+    {
+        printf("Monitor not running.\n");
+        continue;
+    }
+
+        */
+
         if (strcmp(cmd, "start_monitor") == 0) {
             if (monitor_pid) {
                 printf("Monitor already running.\n");
